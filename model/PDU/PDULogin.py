@@ -1,3 +1,4 @@
+import time
 from SQL import User
 from ServerNetwork import network
 from model.PDU import PDUTextmessage
@@ -12,9 +13,13 @@ def appendAtc(tokens):
             "rating": tokens[5],
             "server": "SKYline Technical Server",
             "visual_range": 50,
-            "logon_time": datetime.UTC
+            "logon_time": datetime.UTC,
+            "latitude": tokens[9],
+            "longitude":tokens[10]
         }
     network.atc_list[tokens[0][3:]] = atcdata
+def appendPilot(tokens):
+    pilot_data = ""
 def UserLogin(tokens,client_address):
     print("判断连接")
     userid = tokens[3]
@@ -34,16 +39,21 @@ def UserLogin(tokens,client_address):
                     PDUTextmessage.server_message("Welcome to SKYline Dynamic Flight Server Python edition version 0.1",callsign)
                 if "#AP" in tokens[0]:
                     network.Adduser_pool(callsign, client_address)
+                    appendPilot(tokens)
                     PDUTextmessage.server_message("Welcome to SKYline Dynamic Flight Server Python edition version 0.1",callsign)
             else:
                 network.Adduser_pool(callsign, client_address)
                 PDUTextmessage.server_message("The rating is too high",callsign)
-                network.Deluser_pool(callsign)
+                time.sleep(1)
+                network.Disconnect_pool(callsign)
+
         else:
             network.Adduser_pool(callsign, client_address)
             PDUTextmessage.server_message("The account ID or password is incorrect", callsign)
-            network.Deluser_pool(callsign)
+            time.sleep(1)
+            network.Disconnect_pool(callsign)
     else:
         network.Adduser_pool(callsign, client_address)
         PDUTextmessage.server_message("The account ID or password is incorrect", callsign)
-        network.Deluser_pool(callsign)
+        time.sleep(1)
+        network.Disconnect_pool(callsign)

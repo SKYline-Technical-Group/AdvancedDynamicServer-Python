@@ -27,6 +27,11 @@ def Adduser_pool(callsign,client_address):
     newclients[callsign] = oldclients[client_address]
 def Deluser_pool(callsign):
     del newclients[callsign]
+
+def Disconnect_pool(callsign):
+    newclients[callsign].close()
+    del newclients[callsign]
+    Deluser_pool(callsign)
 def main(ip_port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(ip_port)
