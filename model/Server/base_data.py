@@ -7,7 +7,7 @@ def split_data(data,client_address):
         try:
             New_data_format = i.split(":")
             print(New_data_format)
-            Server.command(New_data_format,client_address)
+            Server.command(New_data_format,i,client_address)
         except:
             pass
 

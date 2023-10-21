@@ -1,10 +1,13 @@
 import socket
 import threading
+import time
+
 from model.Server import base_data
 oldclients = {}
 newclients = {}
 atc_list = {}
 pilot_list = {}
+flight_plan = {}
 def handle_client(client_socket, client_address):
     # 接收客户端发送的数据
     while True:
@@ -12,15 +15,17 @@ def handle_client(client_socket, client_address):
         # 处理接收到的数据
         if not data:
             pass
-        data = data.decode('utf-8')
+        try:
+            data = data.decode('utf-8')
+        except:
+            continue
         threading.Thread(target=base_data.split_data(data,client_address)).start()
 
 def send_data(data, client_address):
     if client_address in newclients:
         # 假设客户端地址为唯一标识符
         dest_client = newclients[client_address]
-        dest_client.sendall(data.encode('utf-8'))
-        print(f"向 {client_address} 发送消息：{data}")
+        dest_client.sendall(data.encode('utf-8')+"\r\n".encode('utf-8'))
 
 def Adduser_pool(callsign,client_address):
     print("添加用户到连接池",callsign)
@@ -29,9 +34,21 @@ def Deluser_pool(callsign):
     del newclients[callsign]
 
 def Disconnect_pool(callsign):
+    time.sleep(1)
     newclients[callsign].close()
     del newclients[callsign]
     Deluser_pool(callsign)
+
+def Disconnect_Native_pools(address):
+    time.sleep(1)
+    oldclients[address].close()
+    del oldclients[address]
+
+def Native_send_data(data,client_address):
+    if client_address in oldclients:
+        # 假设客户端地址为唯一标识符
+        dest_client = oldclients[client_address]
+        dest_client.sendall(data.encode('utf-8'))
 def main(ip_port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(ip_port)
