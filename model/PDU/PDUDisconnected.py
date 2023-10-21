@@ -7,6 +7,6 @@ def Userdisconnected(tokens):
     if "$DP" in tokens[0]:
         print(f"飞行员:{callsign}断开连接")
         del network.pilot_list[callsign]
-    network.Deluser_pool(callsign)
+    network.Disconnect_pool(callsign)
 
 

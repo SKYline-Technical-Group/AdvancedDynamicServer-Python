@@ -8,18 +8,47 @@ newclients = {}
 atc_list = {}
 pilot_list = {}
 flight_plan = {}
+
+#删除异常连接
+def Delete_the_abnormal_connection(client_socket, client_address):
+    client_socket.close()
+    try:
+        del oldclients[client_address]
+    except:
+        pass
+    for i in newclients:
+        if newclients[i] == client_socket:
+            del newclients[i]
+            try:
+                del pilot_list[i]
+            except:
+                pass
+            try:
+                del flight_plan[i]
+            except:
+                pass
+            try:
+                del atc_list[i]
+            except:
+                pass
+            break
+
 def handle_client(client_socket, client_address):
     # 接收客户端发送的数据
     while True:
-        data = client_socket.recv(1024)
-        # 处理接收到的数据
-        if not data:
-            pass
         try:
-            data = data.decode('utf-8')
+            data = client_socket.recv(1024)
+        # 处理接收到的数据
+            if not data:
+                pass
+            try:
+                data = data.decode('utf-8')
+            except:
+                continue
+            threading.Thread(target=base_data.split_data(data,client_address)).start()
         except:
-            continue
-        threading.Thread(target=base_data.split_data(data,client_address)).start()
+            Delete_the_abnormal_connection(client_socket, client_address)
+
 
 def send_data(data, client_address):
     if client_address in newclients:
@@ -30,14 +59,36 @@ def send_data(data, client_address):
 def Adduser_pool(callsign,client_address):
     print("添加用户到连接池",callsign)
     newclients[callsign] = oldclients[client_address]
-def Deluser_pool(callsign):
-    del newclients[callsign]
 
 def Disconnect_pool(callsign):
     time.sleep(1)
     newclients[callsign].close()
-    del newclients[callsign]
-    Deluser_pool(callsign)
+    try:
+        del oldclients[callsign]
+    except:
+        pass
+    try:
+        del newclients[callsign]
+    except:
+        pass
+    try:
+        del pilot_list[callsign]
+    except:
+        pass
+    try:
+        del flight_plan[callsign]
+    except:
+        pass
+    try:
+        del atc_list[callsign]
+    except:
+        pass
+    for i in oldclients:
+        if oldclients[i] == newclients[callsign]:
+            del oldclients[i]
+            break
+    print("删除用户连接池",callsign)
+
 
 def Disconnect_Native_pools(address):
     time.sleep(1)

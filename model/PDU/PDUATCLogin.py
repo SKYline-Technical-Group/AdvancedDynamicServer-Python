@@ -18,7 +18,8 @@ def appendAtc(tokens):
             "rating": tokens[5],
             "server": "SKYline Technical Server",
             "visual_range": 50,
-            "logon_time": datetime.UTC,
+        #输出这种类型的时间2023-10-21 16:26:51
+            "logon_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "latitude": tokens[9],
             "longitude":tokens[10]
         }

@@ -20,7 +20,12 @@ def wallop(raw_data):
         p = network.atc_list[p]
         if p["rating"] >= "11":
             network.send_data(f"{raw_data}\r\n",p)
-
+def server_user(tokens):
+    callsign = tokens[0][3:]
+    if tokens[2] == "FP":
+        data = f"{network.flight_plan[tokens[-1]]['raw_data']}\r\n"
+        network.send_data(data, callsign)
+        return
 def Send_to_users_in_scope(tokens,raw_data):
     callsign = tokens[0][3:]
     userdata = network.pilot_list[callsign]
@@ -39,6 +44,9 @@ def Send_to_users_in_scope(tokens,raw_data):
                 network.send_data(f"{raw_data}\r\n", p["callsign"])
 def Private_chat(tokens,raw_data):
     to = tokens[1]
+    if to == "SERVER":
+        server_user(tokens)
+        return
     if to == "@49999":
         atc_message(raw_data)
         return

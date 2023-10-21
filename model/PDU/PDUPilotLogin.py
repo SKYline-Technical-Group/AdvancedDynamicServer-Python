@@ -13,6 +13,7 @@ def appendPilot(tokens):
     "callsign": tokens[0][3:],
     "realname": tokens[-1],
     "visual_range": 40,
+    "logon_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                   }
     network.pilot_list[tokens[0][3:]] = pilot_data
 def pilot_Login(tokens,client_address):
@@ -43,11 +44,3 @@ def pilot_Login(tokens,client_address):
     else:
         PDUTextmessage.err_server_message("CallsignInUse", client_address, callsign)
         network.Disconnect_Native_pools(client_address)
-# def AtcLogin(tokens,client_address):
-#     callsign = tokens[0][3:]
-#     appendAtc(tokens)
-#     PDUTextmessage.server_message("Welcome to SKYline Dynamic Flight Server Python edition version 0.1", callsign)
-#     network.send_data(f'''$CRSERVER:{callsign}:ATC:Y:{callsign}
-# $CRSERVER:{callsign}:CAPS:ATCINFO=1:ICAOEQ=1:FASTPOS=1
-# $CRSERVER:{callsign}:IP:{client_address[0]}
-# ''',callsign)
